@@ -56,6 +56,7 @@ Log file and version files are csv files stored in *\<output_folder\>*
     | bin                       | string    | The bin or category of the variable. |
     | group_id                  | integer    | Identifier for the group. |
     | index_id                  | integer    | Identifier for the index. |
+    | iv                        | number     | iv value of each variable. |
 
 * Filename:   
     * Do not allow customized filename, the file will be named with the current date in the format *\<main_dataset\>_\<YYYYMMDD\>.csv*.    
@@ -104,21 +105,28 @@ Two dropdown selections:
 The selection will be prefilled with the filename you click on when activating the plugin.
 
 ## Values in Version Selection:  
-* Log file not exists: Null  
-* Log file exists: Distinct ordered list of *changetime* stored in log file.
+* Set a default null value option, because there may not exist log files.
+* Distinct ordered list of *changetime* stored in log file.
 
 
-# Design of Loading data
+# Design of Initialization
 
-## If the version selection is null
+## If the version selection is the default null option
 ```python
 working_state = {
     'original_data': DataFrame,       # Original main data DataFrame
     'current_data': DataFrame,        # Variable,bin,group_id,index_id columns from main data DataFrame
     'changes_history': [],       # Empty
     'changes_lasttime':[],       # Empty
+    'iv_ordred_list':[]          # Initialized from main data 
 } 
 ```
+Initialization of iv_ordred_list
+```python
+iv_ordred_list: [ (variable, sum(train_mc if group_id != 999)) ]
+
+```
+
 ## If the version selection is not null  
 
 Load the *versionfile* of the selected *changetime*.
@@ -128,7 +136,26 @@ working_state = {
     'original_data': DataFrame,       # Original main dataset DataFrame
     'current_data': DataFrame,        # Version file DataFrame
     'changes_history': [],       # Empty
-    'changes_lasttime':[],       # List of change records in the last time
+    'changes_lasttime':[],       # Initialized from log file
+    'iv_ordred_list':[]          # Initialized from main data and version file
 }
 ```
+ Initialization of iv_ordred_list
+```python
+iv_ordred_list: [ (variable, iv) ] # iv is loaded from version file
+```
 
+# Design of Statistics Calculation After Variable Selection
+The situation for null version file is trivial. We only discuss the situation when version file is not null.
+
+1. Filter main data DataFrame and version DataFrame by the variable name.
+2. Use group_id in version DataFrame and original data in main data DataFrame to calculate the statistics
+
+# Design of Editing Group ID
+When we are editing the group ID, we must have chosen a variable. So we have filtered main data DataFrame  
+and version DataFrame.
+
+1. Update the content in Group table.
+2. Update the group_id in working_state[\'current_data\'],  
+    insert change_record into working_state[\'changes_history\']
+3. Recalculate the statistics based on updated group_id and original data.
