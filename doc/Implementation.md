@@ -1,4 +1,4 @@
-# Input Main Dataset
+# Input
 
 The input main dataset is in csv format stored in the *\<input_folder\>*
 
