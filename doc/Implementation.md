@@ -1,6 +1,6 @@
-# Input
+# Input Main Dataset
 
-The input file is in csv format stored in the *\<input_folder\>*
+The input main dataset is in csv format stored in the *\<input_folder\>*
 
 | Column Name               | Data Type | Description |
 |---------------------------|-----------|-------------|
@@ -30,26 +30,73 @@ The input file is in csv format stored in the *\<input_folder\>*
 | test_mc                   | number    | Weight of evidence of the bin belong to the test set. |
 
 # Output
-Both the log file and version files are stored in *\<output_folder\>*  
+Log file and version files are csv files stored in *\<output_folder\>* 
 \* means the column may not be implemented.
-## Updated log file
-| Column Name               | Data Type | Description |
-|---------------------------|-----------|-------------|
-| id                  | integer    | Row index |
-| changetime                  | date    | Updated time |
-| variable                       | string    | Updated variable |
-| bin                       | string    | Updated bin |
-| ori_group_id                  | integer    | Group id in the last save  |
-| new_group_id                  | integer    | Updated group id  |
-| versionfile          | string    | Version file name that stores the result of this change |
-| *username          | string    | User who edits the data |
+## Log file
+* Columns:
+  
+  | Column Name   | Data Type | Description                                      |
+  |---------------|-----------|--------------------------------------------------|
+  | changetime    | date      | Updated time                                     |
+  | variable      | string    | Updated variable                                 |
+  | bin           | string    | Updated bin                                      |
+  | ori_group_id  | integer   | Group id in the last save                        |
+  | new_group_id  | integer   | Updated group id                                 |
+  | versionfile   | string    | Version file name that stores the result of this change |
+  | *username     | string    | User who edits the data                          |
+
+* Filename:  
+    *\<main_dataset\>_log.csv*
 
 ## Version file
-Same structure as the input file.
+* Columns: Same as the input.
+* Filename:   
+    * Do not allow customized filename, the file will be named with the current date in the format *\<main_dataset\>_\<YYYYMMDD\>.csv*.    
+    Because we will have at most one version per day (according to KS).  
+    * The above design will simplify the version management.
+
+# Data Structure for Storing Main dataset, Version File and Editing Data
+
+Use a global variable *working_state* to store data:  
+```python
+working_state = {
+    'original_data': DataFrame,       # Original main data DataFrame
+    'current_data': DataFrame,        # Loaded version file and current editing state DataFrame  
+    'changes_history': [],       # List of change records in the current editing
+    'changes_lasttime':[],       # List of change records in the last time
+} 
+```
+
+The *changes_history* and *changes_lasttime* stores elements:
+```python
+change_record = {
+    'changetime': date,         # When the change was made
+    'variable': string,          # Variable name
+    'bin': string,              # Bin value
+    'old_group_id': integer,     # Previous group_id
+    'new_group_id': integer,     # New group_id
+}
+```
+# Design of UI and Backend
+Two dropdown selections:  
+* Main Dataset
+* Verion
+
+## Values in Main Dataset Selection:
+* A list of filenames in *\<input_folder\>*  
+The selection will be prefilled with the filename you click on when activating the plugin.
+
+## Values in Version Selection:
 
 
-# Design of Version File
 
-# Design of Log File
+### If the user does not choose a version file  
+```python
+working_state = {
+    'original_data': DataFrame,       # Original main data DataFrame
+    'current_data': DataFrame,        # Original main data DataFrame
+    'changes_history': [],       # List of change records in the current editing
+    'changes_lasttime':[],       # List of change records in the last time
+} 
+```
 
-# Design of Loading Version File
