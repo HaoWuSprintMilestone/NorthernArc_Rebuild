@@ -49,7 +49,14 @@ Log file and version files are csv files stored in *\<output_folder\>*
     *\<main_dataset\>_log.csv*
 
 ## Version file
-* Columns: Same as the input.
+* Columns: 
+    | Column Name               | Data Type | Description |
+    |---------------------------|-----------|-------------|
+    | variable                  | string    | The name of the variable being analyzed. |
+    | bin                       | string    | The bin or category of the variable. |
+    | group_id                  | integer    | Identifier for the group. |
+    | index_id                  | integer    | Identifier for the index. |
+
 * Filename:   
     * Do not allow customized filename, the file will be named with the current date in the format *\<main_dataset\>_\<YYYYMMDD\>.csv*.    
     Because we will have at most one version per day (according to KS).  
@@ -64,10 +71,11 @@ working_state = {
     'current_data': DataFrame,        # Loaded version file and current editing state DataFrame  
     'changes_history': [],       # List of change records in the current editing
     'changes_lasttime':[],       # List of change records in the last time
+    'iv_ordred_list':[]          # List of IV values in decsending order
 } 
 ```
 
-The *changes_history* and *changes_lasttime* stores elements:
+The *changes_history* and *changes_lasttime* stores dict elements:
 ```python
 change_record = {
     'changetime': date,         # When the change was made
@@ -77,7 +85,16 @@ change_record = {
     'new_group_id': integer,     # New group_id
 }
 ```
-# Design of UI and Backend
+
+The *iv_ordred_list* stores tuple elements:
+```python
+iv_record = (
+    variable: string,          # Variable name
+    iv: number,              # iv value
+)
+```
+
+# Design of Data Selections 
 Two dropdown selections:  
 * Main Dataset
 * Verion
@@ -86,17 +103,32 @@ Two dropdown selections:
 * A list of filenames in *\<input_folder\>*  
 The selection will be prefilled with the filename you click on when activating the plugin.
 
-## Values in Version Selection:
+## Values in Version Selection:  
+* Log file not exists: Null  
+* Log file exists: Distinct ordered list of *changetime* stored in log file.
 
 
+# Design of Loading data
 
-### If the user does not choose a version file  
+## If the version selection is null
 ```python
 working_state = {
     'original_data': DataFrame,       # Original main data DataFrame
-    'current_data': DataFrame,        # Original main data DataFrame
-    'changes_history': [],       # List of change records in the current editing
-    'changes_lasttime':[],       # List of change records in the last time
+    'current_data': DataFrame,        # Variable,bin,group_id,index_id columns from main data DataFrame
+    'changes_history': [],       # Empty
+    'changes_lasttime':[],       # Empty
 } 
+```
+## If the version selection is not null  
+
+Load the *versionfile* of the selected *changetime*.
+
+```python
+working_state = {
+    'original_data': DataFrame,       # Original main dataset DataFrame
+    'current_data': DataFrame,        # Version file DataFrame
+    'changes_history': [],       # Empty
+    'changes_lasttime':[],       # List of change records in the last time
+}
 ```
 
