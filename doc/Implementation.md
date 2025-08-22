@@ -40,8 +40,8 @@ Log file and version files are csv files stored in *\<output_folder\>*
   | changetime    | date      | Updated time                                     |
   | variable      | string    | Updated variable                                 |
   | bin           | string    | Updated bin                                      |
-  | ori_group_id  | integer   | Group id in the last save                        |
-  | new_group_id  | integer   | Updated group id                                 |
+  | ori_group_id  | integer   | Group id before last edit                        |
+  | new_group_id  | integer   | Updated group id in last edit                     |
   | versionfile   | string    | Version file name that stores the result of this change |
   | *username     | string    | User who edits the data                          |
 
