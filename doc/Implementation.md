@@ -166,15 +166,18 @@ and version DataFrame.
 ```mermaid
 graph LR
     A[Fine Classing Dataset] --> B((Webapp))
-    B --> C[dataset_cc_date_v1]
-    B --> D[dataset_cc_v1_date_log]
-    
     B --> E((Webapp))
-    E --> F[dataset_cc_date_v2]
-    E --> G[dataset_cc_v2_date_log]
     
-    C -.-> D
-    F -.-> G
-    linkStyle 2 stroke:#fff,stroke-width:0px
-    linkStyle 5 stroke:#fff,stroke-width:0px
+    subgraph V1 [Version 1 Output]
+    C[dataset_cc_date_v1]
+    D[dataset_cc_v1_date_log]
+    end
+    
+    subgraph V2 [Version 2 Output]
+    F[dataset_cc_date_v2]
+    G[dataset_cc_v2_date_log]
+    end
+    
+    B --> V1
+    E --> V2
 ```
