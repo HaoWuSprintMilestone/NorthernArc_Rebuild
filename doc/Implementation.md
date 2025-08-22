@@ -173,7 +173,6 @@ graph LR
     E --> F[dataset_cc_date_v2]
     E --> G[dataset_cc_v2_date_log]
     
-    % 调整样式使上下排列的矩形更直观
     C -.-> D
     F -.-> G
     linkStyle 2 stroke:#fff,stroke-width:0px
