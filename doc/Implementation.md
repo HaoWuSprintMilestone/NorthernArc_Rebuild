@@ -45,8 +45,10 @@ Log file and version files are csv files stored in *\<output_folder\>*
   | versionfile   | string    | Version file name that stores the result of this change |
   | *username     | string    | User who edits the data                          |
 
-* Filename:  
-    *\<main_dataset\>_log.csv*
+* Filename:
+    * Support customized filename, the file will be named in the format: *\<main_dataset\>\_cc\_\<YYYYMMDD\>_\<filename\>_log.csv*  
+    cc: Stands for coarse classing  
+    YYYYMMDD: Stands for current date
 
 ## Version file
 * Columns: 
@@ -59,9 +61,9 @@ Log file and version files are csv files stored in *\<output_folder\>*
     | iv                        | number     | iv value of each variable. |
 
 * Filename:   
-    * Do not allow customized filename, the file will be named with the current date in the format *\<main_dataset\>_\<YYYYMMDD\>.csv*.    
-    Because we will have at most one version per day (according to KS).  
-    * The above design will simplify the version management.
+    * Support customized filename, the file will be named in the format: *\<main_dataset\>\_cc\_\<YYYYMMDD\>_\<filename\>.csv*.  
+    cc: Stands for coarse classing  
+    YYYYMMDD: Stands for current date  
 
 # Data Structure for Storing Main dataset, Version File and Editing Data
 
@@ -98,20 +100,20 @@ iv_record = (
 # Design of Data Selections 
 Two dropdown selections:  
 * Main Dataset
-* Verion
+* Verion Log
 
 ## Values in Main Dataset Selection:
 * A list of filenames in *\<input_folder\>*  
 The selection will be prefilled with the filename you click on when activating the plugin.
 
-## Values in Version Selection:  
+## Values in Verion Log Selection:  
 * Set a default null value option, because there may not exist log files.
-* Distinct ordered list of *changetime* stored in log file.
+* List of log files in *\<output_folder\>* ordered by date.
 
 
 # Design of Initialization
 
-## If the version selection is the default null option
+## If the Verion Log selection is the default null option
 ```python
 working_state = {
     'original_data': DataFrame,       # Original main data DataFrame
@@ -127,16 +129,16 @@ iv_ordred_list: [ (variable, sum(train_mc if group_id != 999)) ]
 
 ```
 
-## If the version selection is not null  
+## If the Verion Log selection is not null  
 
-Load the *versionfile* of the selected *changetime*.
+Load the *versionfile* of the selected *log file*.
 
 ```python
 working_state = {
     'original_data': DataFrame,       # Original main dataset DataFrame
     'current_data': DataFrame,        # Version file DataFrame
     'changes_history': [],       # Empty
-    'changes_lasttime':[],       # Initialized from log file
+    'changes_lasttime':[],       # Initialized from log file with changetime = largest(changetime)
     'iv_ordred_list':[]          # Initialized from main data and version file
 }
 ```
@@ -151,7 +153,7 @@ The situation for null version file is trivial. We only discuss the situation wh
 1. Filter main data DataFrame and version DataFrame by the variable name.
 2. Use group_id in version DataFrame and original data in main data DataFrame to calculate the statistics
 
-# Design of Editing Group ID
+# Design of Updating Current Data After Editing Group ID
 When we are editing the group ID, we must have chosen a variable. So we have filtered main data DataFrame  
 and version DataFrame.
 
@@ -159,3 +161,21 @@ and version DataFrame.
 2. Update the group_id in working_state[\'current_data\'],  
     insert change_record into working_state[\'changes_history\']
 3. Recalculate the statistics based on updated group_id and original data.
+
+# Workflow of Updating Log Files and Version Files
+```mermaid
+graph LR
+    A[Fine Classing Dataset] --> B((Webapp))
+    B --> C[dataset_cc_date_v1]
+    B --> D[dataset_cc_v1_date_log]
+    
+    B --> E((Webapp))
+    E --> F[dataset_cc_date_v2]
+    E --> G[dataset_cc_v2_date_log]
+    
+    % 调整样式使上下排列的矩形更直观
+    C -.-> D
+    F -.-> G
+    linkStyle 2 stroke:#fff,stroke-width:0px
+    linkStyle 5 stroke:#fff,stroke-width:0px
+```
