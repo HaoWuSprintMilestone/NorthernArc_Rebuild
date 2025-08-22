@@ -164,20 +164,12 @@ and version DataFrame.
 
 # Workflow of Updating Log Files and Version Files
 ```mermaid
-graph LR
+graph TD
     A[Fine Classing Dataset] --> B((Webapp))
-    B --> E((Webapp))
-    
-    subgraph V1 [Version 1 Output]
-    C[dataset_cc_date_v1]
-    D[dataset_cc_v1_date_log]
-    end
-    
-    subgraph V2 [Version 2 Output]
-    F[dataset_cc_date_v2]
-    G[dataset_cc_v2_date_log]
-    end
-    
-    B --> V1
-    E --> V2
+    B --> C1[dataset_cc_date_v1]
+    B --> C2[dataset_cc_v1_date_log]
+    C1 --> D((Webapp))
+    C2 --> D
+    D --> E1[dataset_cc_date_v2]
+    D --> E2[dataset_cc_v2_date_log]
 ```
