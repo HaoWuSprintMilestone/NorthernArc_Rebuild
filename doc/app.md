@@ -51,3 +51,15 @@ This table displays the real-time ranking of variables based on their IV values.
 - Click the **Save** button to output the Log file and Version file. You can input a customized filename. The format of the saved filenames is:
   - *\<main_dataset\>\_cc\_\<YYYYMMDD\>_\<filename\>_log.csv*
   - *\<main_dataset\>\_cc\_\<YYYYMMDD\>_\<filename\>.csv*
+
+## Workflow of Version Iteration
+```mermaid
+graph TD
+    A[Fine Classing Dataset] --> B((Webapp))
+    B --> C1[dataset_cc_date_v1]
+    B --> C2[dataset_cc_v1_date_log]
+    C1 --> D((Webapp))
+    C2 --> D
+    D --> E1[dataset_cc_date_v2]
+    D --> E2[dataset_cc_v2_date_log]
+```
