@@ -173,3 +173,5 @@ graph TD
     D --> E1[dataset_cc_date_v2]
     D --> E2[dataset_cc_v2_date_log]
 ```
+
+dataset_cc_v2_date_log = Append dataset_cc_v1_date_log with 'changes_history'.
