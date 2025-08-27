@@ -36,7 +36,9 @@ Coarse classing is achieved by editing the `group_id` in the Group Table.
 ### Statistics Table
 1. Has the same structure as the Main Dataset, displaying real-time statistical data based on the `group_id` from the Group Table.
 2. A summary row is added at the bottom of the table, showing the summary results for each statistical data item.
-
+3. There is a dropdown button for filtering data displayed in the statistics table with values: train and test.  
+  3.1. The columns: variable, bin, variable, group_id, index_id will always be displayed.  
+  3.2. If select train, only display statistics related to training data, for example, train_good_count, train_bad_count, train_mc, etc. If select test, only display statistics related to test data.
 ### IV Table
 | Column Name      | Data Type |
 |------------------|-----------|
